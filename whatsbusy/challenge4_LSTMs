@@ -1,0 +1,86 @@
+import pandas as pd
+res = pd.read_csv('test_restaurant.csv')
+
+import matplotlib.pyplot as plt
+ares = res['num_visitors']
+ares.plot()
+plt.show()
+
+
+from numpy import *
+def split_seq(sequence, nsteps):
+  X, y = list(), list()
+  for i in range(len(sequence)):
+    # find end of pattern
+    end_patt = i + nsteps
+    if end_patt > len(sequence)-1:
+      break
+    seq_x = sequence[i:end_patt]
+    seq_y = sequence[end_patt]
+    X.append(seq_x)
+    y.append(seq_y)
+    
+  return array(X), array(y)
+
+# 1 day lag
+
+res_X, res_y = split_seq(ares, 2) # lag value: 1
+
+
+# vanilla LSTM, diff. dimensions
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+from keras.layers import LSTM
+
+# vanilla LSTM
+nsteps = 2
+nfeatures = 1
+vanillamodel = Sequential()
+#model.add(LSTM(50, activation='relu', input_shape=(nfeatures, nsteps))) : for method with train_test_split 
+vanillamodel.add(LSTM(50, activation='relu', input_shape=(nsteps, nfeatures)))
+vanillamodel.add(Dense(1))
+vanillamodel.compile(optimizer='adam', loss='mse')
+
+# eval vanilla LSTM
+Xs = res_X
+ys = res_y
+nfeatures= 1 
+# reshape X 
+Xs = Xs.reshape((Xs.shape[0], Xs.shape[1], nfeatures))
+vanillamodel.fit(Xs, ys, epochs=10)
+
+# demonstrate prediction 
+
+testinput = array( [ares[45], ares[46]])
+testinput = testinput.reshape((1, nsteps,nfeatures))
+yhat = vanillamodel.predict(testinput)
+print(yhat)
+
+
+from keras.layers import Bidirectional
+bidir_model = Sequential()
+n_steps=2
+n_features =1
+bidir_model.add(Bidirectional(LSTM(10, activation='relu'), input_shape=(n_steps, n_features)))
+bidir_model.add(Dense(1))
+bidir_model.compile(optimizer='adam', loss='mse')
+
+# fit model
+bidir_model.fit(Xs, ys, epochs=10)
+
+# stacked LSTM
+
+stacked_model = Sequential()
+
+nunits = 50
+n_steps= 2
+n_features=1
+# LSTM ( units,activation, recurrent_activation)
+# recurrent_activation: Activation function to use for the recurrent step (see activations). Default: hard sigmoid (hard_sigmoid
+stacked_model.add(LSTM(nunits, activation='relu', return_sequences=True, input_shape=(n_steps, n_features)))
+stacked_model.add(LSTM(nunits, activation='relu'))
+stacked_model.add(Dense(1))
+stacked_model.compile(optimizer='adam', loss='mse')
+
+
+
