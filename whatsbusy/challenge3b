@@ -1,0 +1,63 @@
+import pandas as pd
+df = pd.DataFrame({'employee': [1001, 1002, 1004, 1001, 1001, 1002, 1004, 1005, 1005],
+                    'pos': [2, 2, 2, 2, 2, 2, 2, 2, 2],
+                       'amount': [125, 542, 2345, 892, 100, 1234, 657, 34, 35]})
+                       
+# determine min and max of ea. employee
+
+# create new column 
+dflen= len(df)
+
+#df['min'] = max(df['amount'])*dflen
+#df['max'] = min(df['amount'])*dflen
+
+# default min and max vals
+#dmin = min(df['amount'])
+#dmax= max(df['amount'])
+
+# create a dictionary
+minsalary={}
+maxsalary = {}
+
+# init 
+em = df['employee']
+emset= list(set(em))
+
+for e in emset:
+    minsalary[e] = dmax
+    maxsalary[e] = dmin
+
+for index, row in df.iterrows():
+    # row [0] is amount
+    a = row[0]
+    e = row[1]
+    currmin = minsalary[e]
+    currmax = maxsalary[e]
+    if a < currmin:
+        minsalary[e] = a
+    if a> currmax:
+        maxsalary[e] = a
+    
+diffs = []
+for e in emset:
+    diff = maxsalary[e] - minsalary[e]
+    diffs.append(diff)
+    
+adiffs = np.array(diffs)
+aemset = np.array(emset)
+
+inds = adiffs.argsort()
+sortedem = aemset[inds]
+
+diffs.sort()
+
+output1 = sortedem[-1]
+output2 = sortedem[-2]
+outputdiff1 = diffs[-1]
+outputdiff2 = diffs[-2]
+
+# output dataframe:
+
+out = pd.DataFrame({'employee': [output1, output2], 'pos':[2,2], 'amount_diff':[outputdiff1, outputdiff2]})
+
+out.head()
