@@ -1,0 +1,24 @@
+# case study 
+# implement moneybox 
+
+class MoneyBox:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.numbercoins= 0
+    
+    def can_add(self,v):
+        # true if can add v coins, false otherwise 
+        if self.numbercoins >=self.capacity:
+            return False
+        else:
+            return True
+    def add(self,v):
+        # put v coins into moneybox
+        self.numbercoins = self.numbercoins+v
+        
+        
+ # test
+ m = MoneyBox(10)
+ m.add(9)
+ m.add(1)
+ m.can_add(1)
